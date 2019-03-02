@@ -6,19 +6,38 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/xerrors"
 )
 
+type gokoku struct {
+	IncludeVCSDir, ExcludeDotDir bool
+	Suffix                       string
+}
+
+var defaultGokoku = &gokoku{}
+
 func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
+	return defaultGokoku.Scaffold(hfs, root, dst, data)
+}
+
+func (gkk *gokoku) Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
 	return fs.Walk(hfs, root, func(path string, fi os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if fi.IsDir() {
-			if fi.Name() == ".git" {
+			fname := fi.Name()
+			if !gkk.IncludeVCSDir {
+				switch fname {
+				case ".git", ".bzr", ".fossil", ".hg", ".svn":
+					return filepath.SkipDir
+				}
+			}
+			if gkk.ExcludeDotDir && strings.HasPrefix(fname, ".") {
 				return filepath.SkipDir
 			}
 			return nil
@@ -28,7 +47,6 @@ func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
 			return err
 		}
 		dstPath = filepath.Join(dst, dstPath)
-
 		buf := &bytes.Buffer{}
 		if err := template.Must(template.New(dstPath).
 			Option("missingkey=error").Parse(dstPath)).
@@ -40,6 +58,10 @@ func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
 		if err := os.MkdirAll(filepath.Dir(dstPath), 0755); err != nil {
 			return xerrors.Errorf("failed to scaffold while MkdirAll of %q: %w",
 				dstPath, err)
+		}
+		isTmpl := strings.HasSuffix(dstPath, gkk.Suffix)
+		if isTmpl {
+			dstPath = strings.TrimSuffix(dstPath, gkk.Suffix)
 		}
 		err = func() (rerr error) {
 			log.Printf("Writing %s\n", dstPath)
@@ -57,10 +79,14 @@ func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
 			if err != nil {
 				return err
 			}
-			return template.Must(template.New(dstPath+".tmpl").
-				Option("missingkey=error").
-				Parse(string(datum))).
-				Execute(targetF, data)
+			if isTmpl {
+				return template.Must(template.New(dstPath+".tmpl").
+					Option("missingkey=error").
+					Parse(string(datum))).
+					Execute(targetF, data)
+			}
+			_, err = targetF.Write(datum)
+			return err
 		}()
 		if err != nil {
 			return xerrors.Errorf("failed to scaffold while templating %q: %w",
