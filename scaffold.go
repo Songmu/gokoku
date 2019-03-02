@@ -30,7 +30,9 @@ func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
 		dstPath = filepath.Join(dst, dstPath)
 
 		buf := &bytes.Buffer{}
-		if err := template.Must(template.New(dstPath).Parse(dstPath)).Execute(buf, data); err != nil {
+		if err := template.Must(template.New(dstPath).
+			Option("missingkey=error").Parse(dstPath)).
+			Execute(buf, data); err != nil {
 			return xerrors.Errorf("failed to scaffold while resolving dst Path %q: %w",
 				dstPath, err)
 		}
@@ -55,7 +57,9 @@ func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
 			if err != nil {
 				return err
 			}
-			return template.Must(template.New(dstPath+".tmpl").Parse(string(datum))).
+			return template.Must(template.New(dstPath+".tmpl").
+				Option("missingkey=error").
+				Parse(string(datum))).
 				Execute(targetF, data)
 		}()
 		if err != nil {
