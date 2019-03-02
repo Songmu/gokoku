@@ -5,12 +5,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/Songmu/gokoku"
+	"{{.PackagePath}}"
 )
 
 func main() {
 	log.SetFlags(0)
-	err := gokoku.Run(os.Args[1:], os.Stdout, os.Stderr)
+	err := {{.Package}}.Run(os.Args[1:], os.Stdout, os.Stderr)
 	if err != nil && err != flag.ErrHelp {
 		log.Println(err)
 		exitCode := 1
