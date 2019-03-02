@@ -20,6 +20,17 @@ type gokoku struct {
 
 var defaultGokoku = &gokoku{}
 
+// Logger is replaceable logger
+var Logger *log.Logger
+
+func logf(format string, v ...interface{}) {
+	if Logger == nil {
+		log.Printf(format, v...)
+		return
+	}
+	Logger.Printf(format, v...)
+}
+
 func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
 	return defaultGokoku.Scaffold(hfs, root, dst, data)
 }
@@ -64,7 +75,7 @@ func (gkk *gokoku) Scaffold(hfs http.FileSystem, root, dst string, data interfac
 			dstPath = strings.TrimSuffix(dstPath, gkk.Suffix)
 		}
 		err = func() (rerr error) {
-			log.Printf("Writing %s\n", dstPath)
+			logf("Writing %s\n", dstPath)
 			targetF, err := os.Create(dstPath)
 			if err != nil {
 				return err
