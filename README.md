@@ -11,15 +11,18 @@ gokoku
 [license]: https://github.com/Songmu/gokoku/blob/master/LICENSE
 [godoc]: https://godoc.org/github.com/Songmu/gokoku
 
-gokoku short description
+gokoku for scaffolding
 
 ## Synopsis
 
 ```go
-// simple usage here
+data := interface{}{}
+err := gokoku.Scaffold(http.Dir("templatedir", ".", "dstdir", data)
 ```
 
 ## Description
+
+scaffolding from http.FileSystem
 
 ## Installation
 
