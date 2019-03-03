@@ -20,24 +20,24 @@ func tempd(t *testing.T) string {
 	return tempd
 }
 
+var testdata = struct {
+	Author, PackagePath        string
+	GitHubHost, Owner, Package string
+	Year                       int
+}{
+	Author:      "Songmu",
+	PackagePath: "github.com/Songmu/gokoku",
+	GitHubHost:  "github.com",
+	Owner:       "Songmu",
+	Package:     "gokoku",
+	Year:        2019,
+}
+
 func TestScaffold(t *testing.T) {
 	tdir := tempd(t)
 	defer os.RemoveAll(tdir)
 
-	data := struct {
-		Author, PackagePath        string
-		GitHubHost, Owner, Package string
-		Year                       int
-	}{
-		Author:      "Songmu",
-		PackagePath: "github.com/Songmu/gokoku",
-		GitHubHost:  "github.com",
-		Owner:       "Songmu",
-		Package:     "gokoku",
-		Year:        2019,
-	}
-
-	err := Scaffold(http.Dir("testdata/basic"), ".", tdir, data)
+	err := Scaffold(http.Dir("testdata/basic"), ".", tdir, testdata)
 	if err != nil {
 		t.Errorf("something went wrong: %s", err)
 	}
@@ -46,7 +46,22 @@ func TestScaffold(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong: %s", err)
 	}
+}
 
+func TestGokoku_Scaffold(t *testing.T) {
+	tdir := tempd(t)
+	defer os.RemoveAll(tdir)
+
+	gkk := &gokoku{Suffix: ".tmpl"}
+	err := gkk.Scaffold(http.Dir("testdata/basic-suffix"), ".", tdir, testdata)
+	if err != nil {
+		t.Errorf("something went wrong: %s", err)
+	}
+
+	err = dirDiff(tdir, "./testdata/basic-expect")
+	if err != nil {
+		t.Errorf("something went wrong: %s", err)
+	}
 }
 
 func dirDiff(dirA, dirB string) error {
