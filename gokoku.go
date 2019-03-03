@@ -31,11 +31,16 @@ func logf(format string, v ...interface{}) {
 	Logger.Printf(format, v...)
 }
 
+// Scaffold directory from http.FileSystem
 func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
 	return defaultGokoku.Scaffold(hfs, root, dst, data)
 }
 
-func (gkk *gokoku) Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
+// Scaffold directory from http.FileSystem
+func (gkk *gokoku) Scaffold(
+	hfs http.FileSystem,
+	root, dst string,
+	data interface{}) error {
 	return fs.Walk(hfs, root, func(path string, fi os.FileInfo, err error) error {
 		if err != nil {
 			return err
