@@ -16,9 +16,7 @@ devel-deps: deps
 	GO111MODULE=off go get ${u} \
 	  golang.org/x/lint/golint            \
 	  github.com/mattn/goveralls          \
-	  github.com/Songmu/godzil/cmd/godzil \
-	  github.com/Songmu/goxz/cmd/goxz     \
-	  github.com/tcnksm/ghr
+	  github.com/Songmu/godzil/cmd/godzil
 
 .PHONY: test
 test: deps
@@ -33,26 +31,6 @@ lint: devel-deps
 cover: devel-deps
 	goveralls
 
-.PHONY: build
-build: deps
-	go build -ldflags=$(BUILD_LDFLAGS) ./cmd/gokoku
-
-.PHONY: install
-install: build
-	mv gokoku "$(shell go env GOPATH)/bin/"
-
-.PHONY: bump
-bump: devel-deps
-	godzil release
-
-.PHONY: crossbuild
-crossbuild:
-	goxz -pv=v$(VERSION) -build-ldflags=$(BUILD_LDFLAGS) \
-      -os=linux,darwin -d=./dist/v$(VERSION) ./cmd/*
-
-.PHONY: upload
-upload:
-	ghr v$(VERSION) dist/v$(VERSION)
-
 .PHONY: release
-release: bump crossbuild upload
+release: devel-deps
+	godzil release
