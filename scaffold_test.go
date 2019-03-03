@@ -58,8 +58,8 @@ func TestGokoku_Scaffold(t *testing.T) {
 	tdir := tempd(t)
 	defer os.RemoveAll(tdir)
 
-	gkk := &gokoku{Suffix: ".tmpl"}
-	err := gkk.Scaffold(http.Dir("testdata/basic-suffix"), ".", tdir, testdata)
+	tpl := &Tmpl{Suffix: ".tmpl"}
+	err := tpl.Scaffold(http.Dir("testdata/basic-suffix"), ".", tdir, testdata)
 	if err != nil {
 		t.Errorf("something went wrong: %s", err)
 	}
