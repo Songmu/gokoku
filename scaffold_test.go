@@ -6,12 +6,21 @@ import (
 )
 
 func TestScaffold(t *testing.T) {
-	err := Scaffold(http.Dir("testdata/basic"), ".", ".tmp/scaf2", nil)
-	if err != nil {
-		t.Errorf("something went wrong: %s", err)
+	data := struct {
+		Author, PackagePath        string
+		GitHubHost, Owner, Package string
+		Year                       int
+	}{
+		Author:      "Songmu",
+		PackagePath: "github.com/Songmu/gokoku",
+		GitHubHost:  "github.com",
+		Owner:       "Songmu",
+		Package:     "gokoku",
+		Year:        2019,
 	}
 
-	if false {
-		t.Errorf("something went wrong")
+	err := Scaffold(http.Dir("testdata/basic"), ".", ".tmp/scaf22", data)
+	if err != nil {
+		t.Errorf("something went wrong: %s", err)
 	}
 }
