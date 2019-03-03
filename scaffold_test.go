@@ -3,6 +3,7 @@ package gokoku
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,6 +12,11 @@ import (
 
 	"golang.org/x/xerrors"
 )
+
+func TestMain(m *testing.M) {
+	log.SetOutput(ioutil.Discard)
+	os.Exit(m.Run())
+}
 
 func tempd(t *testing.T) string {
 	tempd, err := ioutil.TempDir("", "gokokutest-")
