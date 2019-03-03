@@ -13,12 +13,13 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type gokoku struct {
+// Tmpl is a struct for scaffolding
+type Tmpl struct {
 	IncludeVCSDir, ExcludeDotDir bool
 	Suffix                       string
 }
 
-var defaultGokoku = &gokoku{}
+var defaultGokoku = &Tmpl{}
 
 // Logger is replaceable logger
 var Logger *log.Logger
@@ -31,24 +32,29 @@ func logf(format string, v ...interface{}) {
 	Logger.Printf(format, v...)
 }
 
+// Scaffold directory from http.FileSystem
 func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
 	return defaultGokoku.Scaffold(hfs, root, dst, data)
 }
 
-func (gkk *gokoku) Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
+// Scaffold directory from http.FileSystem
+func (tpl *Tmpl) Scaffold(
+	hfs http.FileSystem,
+	root, dst string,
+	data interface{}) error {
 	return fs.Walk(hfs, root, func(path string, fi os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if fi.IsDir() {
 			fname := fi.Name()
-			if !gkk.IncludeVCSDir {
+			if !tpl.IncludeVCSDir {
 				switch fname {
 				case ".git", ".bzr", ".fossil", ".hg", ".svn":
 					return filepath.SkipDir
 				}
 			}
-			if gkk.ExcludeDotDir && strings.HasPrefix(fname, ".") {
+			if tpl.ExcludeDotDir && strings.HasPrefix(fname, ".") {
 				return filepath.SkipDir
 			}
 			return nil
@@ -70,9 +76,9 @@ func (gkk *gokoku) Scaffold(hfs http.FileSystem, root, dst string, data interfac
 			return xerrors.Errorf("failed to scaffold while MkdirAll of %q: %w",
 				dstPath, err)
 		}
-		isTmpl := strings.HasSuffix(dstPath, gkk.Suffix)
+		isTmpl := strings.HasSuffix(dstPath, tpl.Suffix)
 		if isTmpl {
-			dstPath = strings.TrimSuffix(dstPath, gkk.Suffix)
+			dstPath = strings.TrimSuffix(dstPath, tpl.Suffix)
 		}
 		err = func() (rerr error) {
 			logf("Writing %s\n", dstPath)

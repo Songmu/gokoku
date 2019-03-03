@@ -3,6 +3,7 @@ package gokoku
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,6 +12,11 @@ import (
 
 	"golang.org/x/xerrors"
 )
+
+func TestMain(m *testing.M) {
+	log.SetOutput(ioutil.Discard)
+	os.Exit(m.Run())
+}
 
 func tempd(t *testing.T) string {
 	tempd, err := ioutil.TempDir("", "gokokutest-")
@@ -52,8 +58,8 @@ func TestGokoku_Scaffold(t *testing.T) {
 	tdir := tempd(t)
 	defer os.RemoveAll(tdir)
 
-	gkk := &gokoku{Suffix: ".tmpl"}
-	err := gkk.Scaffold(http.Dir("testdata/basic-suffix"), ".", tdir, testdata)
+	tpl := &Tmpl{Suffix: ".tmpl"}
+	err := tpl.Scaffold(http.Dir("testdata/basic-suffix"), ".", tdir, testdata)
 	if err != nil {
 		t.Errorf("something went wrong: %s", err)
 	}

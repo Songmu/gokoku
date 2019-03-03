@@ -7,6 +7,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
+// LoadPlugin is experimental feature to get http.FileSystem from Go plugin
 func LoadPlugin(plugPath string) (http.FileSystem, error) {
 	plug, err := plugin.Open(plugPath)
 	if err != nil {
