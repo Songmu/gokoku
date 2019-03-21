@@ -34,3 +34,9 @@ cover: devel-deps
 .PHONY: release
 release: devel-deps
 	godzil release
+
+example/statik/statik.go:
+	statik -m -src testdata/basic -dest example
+
+testdata/plugin.so: example/statik/statik.go
+	go build -buildmode=plugin -o $@ example/plugin.go
