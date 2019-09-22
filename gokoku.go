@@ -2,6 +2,7 @@ package gokoku
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +11,6 @@ import (
 	"text/template"
 
 	"github.com/rakyll/statik/fs"
-	"golang.org/x/xerrors"
 )
 
 // Tmpl is a struct for scaffolding
@@ -68,12 +68,12 @@ func (tpl *Tmpl) Scaffold(
 		if err := template.Must(template.New(dstPath).
 			Option("missingkey=error").Parse(dstPath)).
 			Execute(buf, data); err != nil {
-			return xerrors.Errorf("failed to scaffold while resolving dst Path %q: %w",
+			return fmt.Errorf("failed to scaffold while resolving dst Path %q: %w",
 				dstPath, err)
 		}
 		dstPath = buf.String()
 		if err := os.MkdirAll(filepath.Dir(dstPath), 0755); err != nil {
-			return xerrors.Errorf("failed to scaffold while MkdirAll of %q: %w",
+			return fmt.Errorf("failed to scaffold while MkdirAll of %q: %w",
 				dstPath, err)
 		}
 		isTmpl := strings.HasSuffix(dstPath, tpl.Suffix)
@@ -106,7 +106,7 @@ func (tpl *Tmpl) Scaffold(
 			return err
 		}()
 		if err != nil {
-			return xerrors.Errorf("failed to scaffold while templating %q: %w",
+			return fmt.Errorf("failed to scaffold while templating %q: %w",
 				dstPath, err)
 		}
 		return nil

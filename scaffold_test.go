@@ -1,6 +1,7 @@
 package gokoku
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -9,8 +10,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
-
-	"golang.org/x/xerrors"
 )
 
 func TestMain(m *testing.M) {
@@ -125,7 +124,7 @@ func dirDiff(dirA, dirB string) error {
 		return err
 	}
 	if errStr != "" {
-		return xerrors.New(errStr)
+		return errors.New(errStr)
 	}
 	return nil
 }
