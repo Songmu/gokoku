@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -42,7 +41,7 @@ func TestScaffold(t *testing.T) {
 	tdir := tempd(t)
 	defer os.RemoveAll(tdir)
 
-	err := Scaffold(http.Dir("testdata/basic"), ".", tdir, testdata)
+	err := Scaffold(os.DirFS("testdata/basic"), ".", tdir, testdata)
 	if err != nil {
 		t.Errorf("something went wrong: %s", err)
 	}
@@ -58,7 +57,7 @@ func TestGokoku_Scaffold(t *testing.T) {
 	defer os.RemoveAll(tdir)
 
 	tpl := &Tmpl{Suffix: ".tmpl"}
-	err := tpl.Scaffold(http.Dir("testdata/basic-suffix"), ".", tdir, testdata)
+	err := tpl.Scaffold(os.DirFS("testdata/basic-suffix"), ".", tdir, testdata)
 	if err != nil {
 		t.Errorf("something went wrong: %s", err)
 	}
