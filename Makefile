@@ -14,10 +14,9 @@ deps:
 
 .PHONY: devel-deps
 devel-deps: deps
-	GO111MODULE=off go get ${u} \
-	  golang.org/x/lint/golint            \
-	  github.com/mattn/goveralls          \
-	  github.com/Songmu/godzil/cmd/godzil
+	go install golang.org/x/lint/golint@latest
+	go install github.com/mattn/goveralls@latest
+	go install github.com/Songmu/godzil/cmd/godzil@latest
 
 .PHONY: test
 test: deps
@@ -25,7 +24,6 @@ test: deps
 
 .PHONY: lint
 lint: devel-deps
-	go vet
 	golint -set_exit_status
 
 .PHONY: cover
