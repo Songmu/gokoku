@@ -3,14 +3,12 @@ package gokoku
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
-
-	"github.com/rakyll/statik/fs"
 )
 
 // Tmpl is a struct for scaffolding
@@ -33,16 +31,16 @@ func logf(format string, v ...interface{}) {
 }
 
 // Scaffold directory from http.FileSystem
-func Scaffold(hfs http.FileSystem, root, dst string, data interface{}) error {
+func Scaffold(hfs fs.FS, root, dst string, data interface{}) error {
 	return defaultGokoku.Scaffold(hfs, root, dst, data)
 }
 
 // Scaffold directory from http.FileSystem
 func (tpl *Tmpl) Scaffold(
-	hfs http.FileSystem,
+	hfs fs.FS,
 	root, dst string,
 	data interface{}) error {
-	return fs.Walk(hfs, root, func(path string, fi os.FileInfo, err error) error {
+	return fs.WalkDir(hfs, root, func(path string, fi fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
